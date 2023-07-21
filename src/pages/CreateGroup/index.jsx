@@ -23,7 +23,7 @@ function CreateGroup() {
     console.log(groupName);
   }, [groupName, setGroupName]);
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     setGroupName(data.groupName);
   };
 
