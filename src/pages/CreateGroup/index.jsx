@@ -29,45 +29,40 @@ function CreateGroup() {
 
   return (
     <div className="min-h-screen relative bg-blue-100">
-      {/* <CenteredOverlayForm></CenteredOverlayForm> */}
-      <div className="w-full max-w-screen-lg m-auto -translate-y-1/2 -translate-x-1/2 absolute top-1/2 left-1/2 p-4">
-        <div className="card card-side bg-base-100 shadow-xl">
-          <figure className="max-w-screen-sm">
-            <img
-              src="https://images.unsplash.com/photo-1646343961743-ef39d2b02c21?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NjR8fGlsbHVzdHJhdGlvbiUyMHllbGxvd3xlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60"
-              alt="Cover"
+      <CenteredOverlayForm>
+        <figure className="max-w-screen-sm">
+          <img
+            src="https://images.unsplash.com/photo-1646343961743-ef39d2b02c21?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NjR8fGlsbHVzdHJhdGlvbiUyMHllbGxvd3xlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60"
+            alt="Cover"
+          />
+        </figure>
+        <form className="card-body" onSubmit={handleSubmit(onSubmit)}>
+          <div className="w-full max-w-lg flex flex-col mt-[200px]">
+            <p className="w-full text-4xl font-medium text-center leading-snug">
+              Splity 시작하기
+            </p>
+            <input
+              type="text"
+              placeholder="더치 페이 그룹의 이름을 입력해주세요"
+              className="input input-bordered w-full mt-10"
+              spellCheck="false"
+              autoComplete="off"
+              {...register('groupName', {
+                required: '그룹 이름은 빈 칸으로 비워둘 수 없습니다',
+              })}
             />
-          </figure>
-          <form className="card-body" onSubmit={handleSubmit(onSubmit)}>
-            <div className="w-full max-w-lg flex flex-col mt-[200px]">
-              <p className="w-full text-4xl font-medium text-center leading-snug">
-                Splity 시작하기
-              </p>
-              <input
-                type="text"
-                placeholder="더치 페이 그룹의 이름을 입력해주세요"
-                className="input input-bordered w-full mt-10"
-                spellCheck="false"
-                autoComplete="off"
-                {...register('groupName', {
-                  required: '그룹 이름은 빈 칸으로 비워둘 수 없습니다',
-                })}
-              />
 
-              {errors.groupName && (
-                <p className="text-red-500 text-sm mt-2">
-                  {errors.groupName.message}
-                </p>
-              )}
-            </div>
-            <div className="card-actions justify-end mt-auto">
-              <button className="btn btn-primary px-4 min-w-[100px]">
-                저장
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
+            {errors.groupName && (
+              <p className="text-red-500 text-sm mt-2">
+                {errors.groupName.message}
+              </p>
+            )}
+          </div>
+          <div className="card-actions justify-end mt-auto">
+            <button className="btn btn-primary px-4 min-w-[100px]">저장</button>
+          </div>
+        </form>
+      </CenteredOverlayForm>
     </div>
   );
 }
