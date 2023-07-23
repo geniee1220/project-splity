@@ -1,10 +1,11 @@
+import { useEffect } from 'react';
+
 import { useRecoilState } from 'recoil';
 import { groupNameState } from '../../state/groupState';
 
 import { useForm } from 'react-hook-form';
 
 import CenteredOverlayForm from '../../components/CenteredOverlayForm';
-import { useEffect } from 'react';
 
 function CreateGroup() {
   const [groupName, setGroupName] = useRecoilState(groupNameState);
