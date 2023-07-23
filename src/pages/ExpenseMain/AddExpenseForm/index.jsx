@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Datepicker from 'react-tailwindcss-datepicker';
 import { groupMembersState } from '../../../state/groupState';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
@@ -21,6 +21,8 @@ function AddExpenseForm() {
   const {
     register,
     handleSubmit,
+    setError,
+    watch,
     formState: { errors },
   } = useForm({
     mode: 'onChange',
@@ -37,6 +39,13 @@ function AddExpenseForm() {
   const onSubmit = (data) => {
     const { desc, amount } = data;
 
+    if (selectedValue === 'default') {
+      setError('payer', {
+        type: 'vaildation',
+        message: '결제자를 선택해주세요',
+      });
+    }
+
     const newExpense = {
       date: value.startDate,
       desc: desc,
@@ -52,7 +61,7 @@ function AddExpenseForm() {
       onSubmit={handleSubmit(onSubmit)}
       className="w-full max-w-screen-sm m-auto -translate-y-1/2 -translate-x-1/2 absolute top-1/2 left-1/2 p-8 border rounded"
     >
-      <h2 className="text-3xl text-center mb-6">비용 정산하기</h2>
+      <h2 className="text-3xl text-center mb-6">Splity 비용 관리</h2>
 
       {/* 결제 날짜 선택 */}
       <div className="flex items-center input input-bordered rounded mb-4 pr-0">
@@ -70,7 +79,7 @@ function AddExpenseForm() {
       <input
         className="w-full flex items-center input input-bordered rounded mb-4"
         placeholder="비용에 대한 설명을 입력해주세요"
-        {...register('desc')}
+        {...register('desc', { required: '결제 내용을 입력해주세요' })}
       />
 
       {/* 비용 입력 */}
@@ -80,7 +89,7 @@ function AddExpenseForm() {
           type="number"
           placeholder="비용을 입력해주세요"
           {...register('amount', {
-            required: '비용을 빈 칸으로 비워둘 수 없습니다.',
+            required: '비용을 빈 칸으로 비워둘 수 없습니다',
           })}
         />
 
@@ -91,6 +100,7 @@ function AddExpenseForm() {
           } input-bordered rounded `}
           value={selectedValue}
           onChange={handleChange}
+          {...register('payer')}
         >
           <option value="default" disabled hidden>
             결제한 사람은?
@@ -103,6 +113,16 @@ function AddExpenseForm() {
           ))}
         </select>
       </div>
+
+      {errors.desc && (
+        <p className="text-red-500 text-sm mt-2">{errors.desc.message}</p>
+      )}
+      {errors.amount && (
+        <p className="text-red-500 text-sm mt-2">{errors.amount.message}</p>
+      )}
+      {errors.payer && (
+        <p className="text-red-500 text-sm mt-2">{errors.payer.message}</p>
+      )}
 
       {/* 비용 추가 버튼 */}
       <div className="w-full mt-10">
