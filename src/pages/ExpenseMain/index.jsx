@@ -1,4 +1,5 @@
 import React from 'react';
+import AddExpenseForm from './AddExpenseForm';
 
 function ExpenseMain() {
   return (
@@ -6,6 +7,7 @@ function ExpenseMain() {
       ExpenseMain Component
       <div>
         {/* TODO : 비용 추가 폼 */}
+        <AddExpenseForm />
         {/* TODO : 정산 결과 컴포넌트 렌더링TODO :  */}
       </div>
       <div>
