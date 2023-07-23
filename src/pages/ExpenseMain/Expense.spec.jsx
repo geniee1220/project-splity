@@ -1,5 +1,5 @@
 import { RecoilRoot } from 'recoil';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ExpensiveMain from '.';
 import { groupMembersState } from '../../state/groupState';
@@ -111,14 +111,30 @@ describe('비용 정산 메인 페이지', () => {
   });
 
   describe('비용 입력 시나리오', () => {
-    const addNewExpense = async (desc, amount, payer) => {
-      const { dateInput, descInput, amountInput, payerInput } =
+    const addNewExpense = async () => {
+      const { dateInput, descInput, amountInput, payerInput, addButton } =
         renderComponent();
+      await userEvent.type(dateInput, '2023-07-24');
+      await userEvent.type(descInput, '설명');
+      await userEvent.type(amountInput, '10000');
+      await userEvent.selectOptions(payerInput, '장유진');
+      await userEvent.click(addButton);
     };
     test('비용 데이터가 존재할 경우 정산 리스트에 날짜, 내용, 결제자, 금액 데이터 노출', () => {
-      renderComponent();
-
+      //   renderComponent();
+      addNewExpense();
       const expenseListComponent = screen.getByTestId('expenseList');
+      const dateValue = within(expenseListComponent).getByText('2023-07-24');
+      expect(dateValue).toBeInTheDocument();
+
+      const descValue = within(expenseListComponent).getByText('설명');
+      expect(descValue).toBeInTheDocument();
+
+      const payerValue = within(expenseListComponent).getByText('장유진');
+      expect(payerValue).toBeInTheDocument();
+
+      const amountValue = within(expenseListComponent).getByText('10000');
+      expect(amountValue).toBeInTheDocument();
     });
   });
 });
