@@ -6,9 +6,11 @@ import { groupNameState } from '../../state/groupState';
 import { useForm } from 'react-hook-form';
 
 import CenteredOverlayForm from '../../components/CenteredOverlayForm';
+import { useNavigate } from 'react-router-dom';
 
 function CreateGroup() {
   const [groupName, setGroupName] = useRecoilState(groupNameState);
+  const navigate = useNavigate();
 
   const {
     register,
@@ -26,6 +28,7 @@ function CreateGroup() {
 
   const onSubmit = async (data) => {
     setGroupName(data.groupName);
+    navigate('/members');
   };
 
   return (
