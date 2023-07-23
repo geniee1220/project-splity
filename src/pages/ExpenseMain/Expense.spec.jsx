@@ -53,7 +53,9 @@ describe('비용 정산 메인 페이지', () => {
       );
       expect(payerErrorMessage).toBeInTheDocument();
 
-      const amountErrorMessage = await screen.findByText('비용을 입력해주세요');
+      const amountErrorMessage = await screen.findByText(
+        '비용을 빈 칸으로 비워둘 수 없습니다'
+      );
       expect(amountErrorMessage).toBeInTheDocument();
     });
 
