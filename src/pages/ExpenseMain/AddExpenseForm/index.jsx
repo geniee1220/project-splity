@@ -4,10 +4,13 @@ import { groupMembersState } from '../../../state/groupState';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { useForm } from 'react-hook-form';
 import { expenseState } from '../../../state/expenseState';
+import { addExpenseModalState } from '../../../state/modalState';
 
-function AddExpenseForm() {
+function AddExpenseForm({ className, onSubmitHandler }) {
   const [members, setMembers] = useRecoilState(groupMembersState);
   const [expense, setExpense] = useRecoilState(expenseState);
+  const [isAddExpenseForm, setIsAddExpenseForm] =
+    useState(addExpenseModalState);
 
   // 결제 날짜
   const [value, setValue] = useState({
@@ -16,31 +19,28 @@ function AddExpenseForm() {
   });
 
   // 결제자
-  const [selectedValue, setSelectedValue] = useState('default');
-
   const {
     register,
     handleSubmit,
     setError,
     watch,
+    reset,
     formState: { errors },
   } = useForm({
     mode: 'onChange',
   });
 
+  const selectedValue = watch('payer', 'default');
+
   const handleValueChange = (newValue) => {
     setValue(newValue);
   };
 
-  const handleChange = (event) => {
-    setSelectedValue(event.target.value);
-  };
-
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     const { desc, amount } = data;
 
     if (selectedValue === 'default') {
-      setError('payer', {
+      return setError('payer', {
         type: 'vaildation',
         message: '결제자를 선택해주세요',
       });
@@ -54,12 +54,21 @@ function AddExpenseForm() {
     };
 
     setExpense([...expense, newExpense]);
+
+    // 저장 후, 폼 초기화
+    setValue({
+      startDate: null,
+      endDate: null,
+    });
+    reset();
+    onSubmitHandler();
   };
 
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="w-full max-w-screen-sm m-auto -translate-y-1/2 -translate-x-1/2 absolute top-1/2 left-1/2 p-8 border rounded"
+      className={`w-full max-w-screen-sm m-auto -translate-y-1/2 -translate-x-1/2 absolute top-1/2 left-1/2 p-8 border rounded ${className}`}
+      textid="modal"
     >
       <h2 className="text-3xl text-center mb-6">Splity 비용 관리</h2>
 
@@ -99,12 +108,12 @@ function AddExpenseForm() {
             selectedValue === 'default' ? 'text-gray-400' : ''
           } input-bordered rounded `}
           value={selectedValue}
-          onChange={handleChange}
           {...register('payer')}
         >
           <option value="default" disabled hidden>
             결제한 사람은?
           </option>
+          <option value="유진">유진</option>
 
           {members.map((member, index) => (
             <option key={index} value={member}>
@@ -127,7 +136,7 @@ function AddExpenseForm() {
       {/* 비용 추가 버튼 */}
       <div className="w-full mt-10">
         <button className="btn btn-block btn-primary px-4 min-w-[100px] rounded">
-          비용 추가하기
+          결제내역 추가
         </button>
       </div>
     </form>
