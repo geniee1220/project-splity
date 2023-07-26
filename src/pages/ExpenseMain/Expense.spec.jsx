@@ -19,7 +19,7 @@ const renderComponent = () => {
   const descInput = screen.getByPlaceholderText(/비용에 대한/i);
   const amountInput = screen.getByPlaceholderText(/비용을 입력/i);
   const payerInput = screen.getByDisplayValue(/결제한 사람/i);
-  const addButton = screen.getByText('비용 추가하기');
+  const addButton = screen.getByText('결제내역 추가');
 
   return {
     dateInput,
@@ -120,9 +120,8 @@ describe('비용 정산 메인 페이지', () => {
       await userEvent.selectOptions(payerInput, '장유진');
       await userEvent.click(addButton);
     };
-    test('비용 데이터가 존재할 경우 정산 리스트에 날짜, 내용, 결제자, 금액 데이터 노출', () => {
-      //   renderComponent();
-      addNewExpense();
+    test('비용 데이터가 존재할 경우 정산 리스트에 날짜, 내용, 결제자, 금액 데이터 노출', async () => {
+      await addNewExpense();
       const expenseListComponent = screen.getByTestId('expenseList');
       const dateValue = within(expenseListComponent).getByText('2023-07-24');
       expect(dateValue).toBeInTheDocument();
@@ -133,7 +132,7 @@ describe('비용 정산 메인 페이지', () => {
       const payerValue = within(expenseListComponent).getByText('장유진');
       expect(payerValue).toBeInTheDocument();
 
-      const amountValue = within(expenseListComponent).getByText('10000');
+      const amountValue = within(expenseListComponent).getByText('10000 원');
       expect(amountValue).toBeInTheDocument();
     });
   });
