@@ -3,11 +3,18 @@ import AddExpenseForm from './AddExpenseForm';
 import ExpenseTable from '../../components/ExpenseTable';
 import Logo from '../../components/Logo';
 import { useRecoilState } from 'recoil';
-import { addExpenseModalState } from '../../state/modalState';
+import {
+  addExpenseModalState,
+  settlementSummaryModalState,
+} from '../../state/modalState';
+import SettlementSummary from './SettlementSummery';
 
 function ExpenseMain() {
   const [isAddExpenseForm, setIsAddExpenseForm] =
     useRecoilState(addExpenseModalState);
+  const [isSettlementSummary, setIsSettlementSummary] = useRecoilState(
+    settlementSummaryModalState
+  );
 
   return (
     <main>
@@ -30,7 +37,10 @@ function ExpenseMain() {
             onSubmitHandler={() => setIsAddExpenseForm(!isAddExpenseForm)}
           />
 
-          {/* TODO : 정산 결과 컴포넌트 렌더링TODO :  */}
+          {/* 정산 결과 모달 컴포넌트  */}
+          <SettlementSummary
+          // onSubmitHandler={() => setIsSettlementSummary(!isSettlementSummary)}
+          />
 
           <div className="flex w-full justify-end mb-6">
             <button
