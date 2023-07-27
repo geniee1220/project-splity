@@ -67,10 +67,10 @@ function AddExpenseForm({ className, onSubmitHandler }) {
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className={`w-full max-w-screen-sm m-auto -translate-y-1/2 -translate-x-1/2 absolute top-1/2 left-1/2 p-8 border rounded ${className}`}
+      className={`w-full max-w-screen-sm m-auto -translate-y-1/2 -translate-x-1/2 absolute top-1/2 left-1/2 p-8 border rounded bg-white	${className}`}
       textid="modal"
     >
-      <h2 className="text-3xl text-center mb-6">Splity 비용 관리</h2>
+      <h2 className="text-3xl text-center mb-6">결제내역 추가</h2>
 
       {/* 결제 날짜 선택 */}
       <div className="flex items-center input input-bordered rounded mb-4 pr-0">
@@ -113,8 +113,6 @@ function AddExpenseForm({ className, onSubmitHandler }) {
           <option value="default" disabled hidden>
             결제한 사람은?
           </option>
-          <option value="유진">유진</option>
-
           {members.map((member, index) => (
             <option key={index} value={member}>
               {member}
@@ -136,7 +134,7 @@ function AddExpenseForm({ className, onSubmitHandler }) {
       {/* 비용 추가 버튼 */}
       <div className="w-full mt-10">
         <button className="btn btn-block btn-primary px-4 min-w-[100px] rounded">
-          결제내역 추가
+          비용 정산하기
         </button>
       </div>
     </form>
