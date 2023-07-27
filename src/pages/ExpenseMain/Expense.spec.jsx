@@ -8,7 +8,7 @@ const renderComponent = () => {
   render(
     <RecoilRoot
       initializeState={(snap) => {
-        snap.set(groupMembersState, ['장유진']);
+        snap.set(groupMembersState, ['유진', '영남']);
       }}
     >
       <ExpensiveMain />
@@ -19,7 +19,7 @@ const renderComponent = () => {
   const descInput = screen.getByPlaceholderText(/비용에 대한/i);
   const amountInput = screen.getByPlaceholderText(/비용을 입력/i);
   const payerInput = screen.getByDisplayValue(/결제한 사람/i);
-  const addButton = screen.getByText('결제내역 추가');
+  const addButton = screen.getByText('비용 정산하기');
 
   return {
     dateInput,
@@ -80,7 +80,7 @@ describe('비용 정산 메인 페이지', () => {
 
       await userEvent.type(descInput, '비용 설명');
       await userEvent.type(amountInput, '10000');
-      await userEvent.selectOptions(payerInput, '장유진');
+      await userEvent.selectOptions(payerInput, '유진');
       userEvent.click(addButton);
 
       await waitFor(() => {
@@ -110,6 +110,15 @@ describe('비용 정산 메인 페이지', () => {
     });
   });
 
+  describe('비용 정산 컴포넌트 관련 테스트', () => {
+    test('비용 정산 컴포넌트 렌더링 확인', () => {
+      renderComponent();
+
+      const component = screen.getByText('비용 정산');
+      expect(component).toBeInTheDocument();
+    });
+  });
+
   describe('비용 입력 시나리오', () => {
     const addNewExpense = async () => {
       const { dateInput, descInput, amountInput, payerInput, addButton } =
@@ -117,11 +126,15 @@ describe('비용 정산 메인 페이지', () => {
       await userEvent.type(dateInput, '2023-07-24');
       await userEvent.type(descInput, '설명');
       await userEvent.type(amountInput, '10000');
-      await userEvent.selectOptions(payerInput, '장유진');
+      await userEvent.selectOptions(payerInput, '유진');
       await userEvent.click(addButton);
     };
-    test('비용 데이터가 존재할 경우 정산 리스트에 날짜, 내용, 결제자, 금액 데이터 노출', async () => {
+
+    beforeEach(async () => {
       await addNewExpense();
+    });
+
+    test('비용 데이터가 존재할 경우 정산 리스트에 날짜, 내용, 결제자, 금액 데이터 노출', () => {
       const expenseListComponent = screen.getByTestId('expenseList');
       const dateValue = within(expenseListComponent).getByText('2023-07-24');
       expect(dateValue).toBeInTheDocument();
@@ -129,11 +142,30 @@ describe('비용 정산 메인 페이지', () => {
       const descValue = within(expenseListComponent).getByText('설명');
       expect(descValue).toBeInTheDocument();
 
-      const payerValue = within(expenseListComponent).getByText('장유진');
+      const payerValue = within(expenseListComponent).getByText('유진');
       expect(payerValue).toBeInTheDocument();
 
       const amountValue = within(expenseListComponent).getByText('10000 원');
       expect(amountValue).toBeInTheDocument();
+    });
+
+    test('정산 결과 업데이트', () => {
+      const totalText = screen.getByText(/2명이 총 10000원 지출/i);
+      expect(totalText).toBeInTheDocument();
+
+      const transactionText = screen.getByText(/영남님이 유진님에게 5000원/i);
+      expect(transactionText).toBeInTheDocument();
+    });
+
+    const htmlToImage = require('html-to-image');
+    test('정산 결과를 이미지로 저장', async () => {
+      const spiedToPng = jest.spyOn(htmlToImage, 'toPng');
+      const downloadButton = screen.getByTestId('downloadButton');
+      expect(downloadButton).toBeInTheDocument();
+
+      await userEvent.click(downloadButton);
+
+      expect(spiedToPng).toHaveBeenCalledTimes(1);
     });
   });
 });
