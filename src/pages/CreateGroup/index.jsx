@@ -34,14 +34,8 @@ function CreateGroup() {
   return (
     <div className="min-h-screen relative bg-blue-100">
       <CenteredOverlayForm>
-        <figure className="max-w-screen-sm">
-          <img
-            src="https://images.unsplash.com/photo-1646343961743-ef39d2b02c21?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NjR8fGlsbHVzdHJhdGlvbiUyMHllbGxvd3xlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=800&q=60"
-            alt="Cover"
-          />
-        </figure>
         <form className="card-body" onSubmit={handleSubmit(onSubmit)}>
-          <div className="w-full max-w-lg flex flex-col mt-[200px]">
+          <div className="w-full max-w-lg flex flex-col mt-16">
             <p className="w-full text-4xl font-medium text-center leading-snug">
               Splity 시작하기
             </p>
