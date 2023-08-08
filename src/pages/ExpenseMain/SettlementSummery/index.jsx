@@ -4,7 +4,6 @@ import { groupMembersState } from '../../../state/groupState';
 
 import { BiDownload } from 'react-icons/bi';
 
-import * as htmlToImage from 'html-to-image';
 import { toPng, toJpeg, toBlob, toPixelData, toSvg } from 'html-to-image';
 import { useRef } from 'react';
 
