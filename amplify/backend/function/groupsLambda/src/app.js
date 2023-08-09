@@ -62,46 +62,6 @@ const convertUrlType = (param, type) => {
   }
 };
 
-/********************************
- * HTTP Get method for list objects *
- ********************************/
-
-app.get(path + hashKeyPath, async function (req, res) {
-  const condition = {};
-  condition[partitionKeyName] = {
-    ComparisonOperator: 'EQ',
-  };
-
-  if (req.apiGateway) {
-    // userIdPresent &&
-    condition[partitionKeyName]['AttributeValueList'] = [
-      req.apiGateway.event.requestContext.identity.cognitoIdentityId || UNAUTH,
-    ];
-  } else {
-    try {
-      condition[partitionKeyName]['AttributeValueList'] = [
-        convertUrlType(req.params[partitionKeyName], partitionKeyType),
-      ];
-    } catch (err) {
-      res.statusCode = 500;
-      res.json({ error: 'Wrong column type ' + err });
-    }
-  }
-
-  let queryParams = {
-    TableName: tableName,
-    KeyConditions: condition,
-  };
-
-  try {
-    const data = await ddbDocClient.send(new QueryCommand(queryParams));
-    res.json(data.Items);
-  } catch (err) {
-    res.statusCode = 500;
-    res.json({ error: 'Could not load items: ' + err.message });
-  }
-});
-
 /*****************************************
  * HTTP Get method for get single object *
  *****************************************/
@@ -159,6 +119,48 @@ app.get(
 );
 
 /************************************
+ * HTTP put method for adding an expense to the group - 비용 추가 API *
+ *************************************/
+app.put(`${path}${hashKeyPath}/expenses`, async function (req, res) {
+  const guid = req.params[partitionKeyName];
+  const { expense } = req.body;
+
+  if (
+    expense === null ||
+    expense === undefined ||
+    !expense.payer ||
+    !expense.amount
+  ) {
+    res.statusCode = 400;
+    res.json({ error: 'invalid expense' });
+
+    return;
+  }
+
+  let updateItemParams = {
+    TableName: tableName,
+    Key: {
+      [partitionKeyName]: guid,
+    },
+    UpdateExpression:
+      'SET expenses = list_append(if_not_exists(expenses, :empty_list), :vals)',
+    ExpressionAttributeValues: {
+      ':vals': [expense],
+      ':empty_list': [],
+    },
+  };
+
+  try {
+    let data = await ddbDocClient.send(new UpdateCommand(updateItemParams));
+    res.statusCode = 200;
+    res.json({ data: data });
+  } catch (err) {
+    res.statusCode = 500;
+    res.json({ error: err });
+  }
+});
+
+/************************************
  * HTTP put method for adding members to the group - 멤버 추가 API *
  *************************************/
 
@@ -187,7 +189,7 @@ app.put(`${path}${hashKeyPath}/members`, async function (req, res) {
     Key: {
       [partitionKeyName]: guid,
     },
-    UpdateExpression: 'set members = :members',
+    UpdateExpression: 'SET members = :members',
     ExpressionAttributeValues: {
       ':members': members,
     },
