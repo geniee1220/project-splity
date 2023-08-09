@@ -108,11 +108,7 @@ app.get(path + hashKeyPath, async function (req, res) {
 
   try {
     const data = await ddbDocClient.send(new GetCommand(getItemParams));
-    if (data.Item) {
-      res.json({ data: data.Item });
-    } else {
-      res.json(data);
-    }
+    res.json({ data: data.Item });
   } catch (err) {
     res.statusCode = 500;
     res.json({ error: 'Could not load items: ' + err.message });
