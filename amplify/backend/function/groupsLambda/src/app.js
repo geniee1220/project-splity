@@ -12,11 +12,13 @@ const {
   DynamoDBDocumentClient,
   GetCommand,
   PutCommand,
+  UpdateCommand,
   QueryCommand,
 } = require('@aws-sdk/lib-dynamodb');
 const awsServerlessExpressMiddleware = require('aws-serverless-express/middleware');
 const bodyParser = require('body-parser');
 const express = require('express');
+const { default: dynamic } = require('next/dynamic');
 const uuidv1 = require('uuid').v1;
 
 const ddbClient = new DynamoDBClient({ region: process.env.TABLE_REGION });
@@ -157,25 +159,48 @@ app.get(
 );
 
 /************************************
- * HTTP put method for insert object *
+ * HTTP put method for adding members to the group - 멤버 추가 API *
  *************************************/
 
-app.put(path, async function (req, res) {
+app.put(`${path}${hashKeyPath}/members`, async function (req, res) {
   // if (userIdPresent) {
   //   req.body['userId'] =
   //     req.apiGateway.event.requestContext.identity.cognitoIdentityId || UNAUTH;
   // }
+  const guid = req.params[partitionKeyName];
+  const { members } = req.body;
 
-  let putItemParams = {
+  if (
+    members === null ||
+    members === undefined ||
+    !Array.isArray(members) ||
+    members.length === 0
+  ) {
+    res.statusCode = 400;
+    res.json({ error: 'invalid members' });
+
+    return;
+  }
+
+  let updateItemParams = {
     TableName: tableName,
-    Item: req.body,
+    Key: {
+      [partitionKeyName]: guid,
+    },
+    UpdateExpression: 'set members = :members',
+    ExpressionAttributeValues: {
+      ':members': members,
+    },
   };
+
   try {
-    let data = await ddbDocClient.send(new PutCommand(putItemParams));
-    res.json({ success: 'put call succeed!', url: req.url, data: data });
+    let data = await ddbDocClient.send(new UpdateCommand(updateItemParams));
+    res.statusCode = 200;
+    res.json({ data: data });
   } catch (err) {
+    console.log(members);
     res.statusCode = 500;
-    res.json({ error: err, url: req.url, body: req.body });
+    res.json({ error: err });
   }
 });
 
@@ -199,6 +224,7 @@ app.post(path, async function (req, res) {
   ) {
     res.statusCode = 400;
     res.json({ error: 'invalid group name' });
+
     return;
   }
 
