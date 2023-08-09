@@ -17,6 +17,7 @@ const {
 const awsServerlessExpressMiddleware = require('aws-serverless-express/middleware');
 const bodyParser = require('body-parser');
 const express = require('express');
+const uuidv1 = require('uuid').v1;
 
 const ddbClient = new DynamoDBClient({ region: process.env.TABLE_REGION });
 const ddbDocClient = DynamoDBDocumentClient.from(ddbClient);
@@ -179,7 +180,7 @@ app.put(path, async function (req, res) {
 });
 
 /************************************
- * HTTP post method for insert object *
+ * HTTP post method for creating a group - 그룹 생성 api *
  *************************************/
 
 app.post(path, async function (req, res) {
@@ -188,16 +189,32 @@ app.post(path, async function (req, res) {
   //     req.apiGateway.event.requestContext.identity.cognitoIdentityId || UNAUTH;
   // }
 
+  const { groupName } = req.body;
+  const guid = uuidv1();
+
+  if (
+    groupName === null ||
+    groupName.trim().length === 0 ||
+    groupName === undefined
+  ) {
+    res.statusCode = 400;
+    res.json({ error: 'invalid group name' });
+    return;
+  }
+
   let putItemParams = {
     TableName: tableName,
-    Item: req.body,
+    Item: {
+      groupName: groupName,
+      guid: guid,
+    },
   };
   try {
     let data = await ddbDocClient.send(new PutCommand(putItemParams));
-    res.json({ success: 'post call succeed!', url: req.url, data: data });
+    res.json({ data: { guid: guid } });
   } catch (err) {
     res.statusCode = 500;
-    res.json({ error: err, url: req.url, body: req.body });
+    res.json({ error: err });
   }
 });
 
