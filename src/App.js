@@ -4,6 +4,10 @@ import AddMembers from './pages/AddMembers';
 import ExpenseMain from './pages/ExpenseMain';
 import { RecoilRoot } from 'recoil';
 
+import { Amplify } from 'aws-amplify';
+import awsmobile from './aws-exports';
+Amplify.configure(awsmobile);
+
 function App() {
   return (
     <BrowserRouter>

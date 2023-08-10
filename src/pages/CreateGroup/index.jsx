@@ -7,6 +7,7 @@ import { useForm } from 'react-hook-form';
 
 import CenteredOverlayForm from '../../components/CenteredOverlayForm';
 import { useNavigate } from 'react-router-dom';
+import { API } from 'aws-amplify';
 
 function CreateGroup() {
   const [groupName, setGroupName] = useRecoilState(groupNameState);
@@ -27,8 +28,21 @@ function CreateGroup() {
   }, [groupName, setGroupName]);
 
   const onSubmit = async (data) => {
-    setGroupName(data.groupName);
-    navigate('/members');
+    console.log(data.groupName);
+
+    API.post('groupsApi', '/groups', {
+      body: {
+        groupName: data.groupName,
+      },
+    })
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    // navigate('/members');
   };
 
   return (
