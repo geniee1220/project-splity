@@ -28,21 +28,8 @@ function CreateGroup() {
   }, [groupName, setGroupName]);
 
   const onSubmit = async (data) => {
-    console.log(data.groupName);
-
-    API.post('groupsApi', '/groups', {
-      body: {
-        groupName: data.groupName,
-      },
-    })
-      .then((res) => {
-        console.log(res);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-
-    // navigate('/members');
+    setGroupName(data.groupName);
+    navigate('/members');
   };
 
   return (
