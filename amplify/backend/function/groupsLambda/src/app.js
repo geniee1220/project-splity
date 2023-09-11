@@ -109,7 +109,7 @@ app.get(path + hashKeyPath, async function (req, res) {
   try {
     const data = await ddbDocClient.send(new GetCommand(getItemParams));
     if (data.Item) {
-      res.json(data.Item);
+      res.json({ data: data.Item });
     } else {
       res.json(data);
     }
