@@ -32,13 +32,13 @@ if (process.env.ENV && process.env.ENV !== 'NONE') {
 // const userIdPresent = false; // TODO: update in case is required to use that definition
 const partitionKeyName = 'guid';
 const partitionKeyType = 'S';
-const sortKeyName = '';
-const sortKeyType = '';
-const hasSortKey = sortKeyName !== '';
+// const sortKeyName = '';
+// const sortKeyType = '';
+// const hasSortKey = sortKeyName !== '';
 const path = '/groups';
 const UNAUTH = 'UNAUTH';
 const hashKeyPath = '/:' + partitionKeyName;
-const sortKeyPath = hasSortKey ? '/:' + sortKeyName : '';
+// const sortKeyPath = hasSortKey ? '/:' + sortKeyName : '';
 
 // declare a new express app
 const app = express();
@@ -254,7 +254,8 @@ app.post(path, async function (req, res) {
  ***************************************/
 
 app.delete(
-  path + '/object' + hashKeyPath + sortKeyPath,
+  path + '/object' + hashKeyPath,
+  // + sortKeyPath
   async function (req, res) {
     const params = {};
     if (req.apiGateway) {
@@ -274,17 +275,18 @@ app.delete(
         res.json({ error: 'Wrong column type ' + err });
       }
     }
-    if (hasSortKey) {
-      try {
-        params[sortKeyName] = convertUrlType(
-          req.params[sortKeyName],
-          sortKeyType
-        );
-      } catch (err) {
-        res.statusCode = 500;
-        res.json({ error: 'Wrong column type ' + err });
-      }
-    }
+
+    // if (hasSortKey) {
+    //   try {
+    //     params[sortKeyName] = convertUrlType(
+    //       req.params[sortKeyName],
+    //       sortKeyType
+    //     );
+    //   } catch (err) {
+    //     res.statusCode = 500;
+    //     res.json({ error: 'Wrong column type ' + err });
+    //   }
+    // }
 
     let removeItemParams = {
       TableName: tableName,
