@@ -1,0 +1,7 @@
+{
+  "httpMethod": "GET",
+  "path": "/groups/d946ffd0-3670-11ee-8859-dbde2c1ec57c",
+  "headers": {
+    "Content-Type": "application/json"
+  }
+}

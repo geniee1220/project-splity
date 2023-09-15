@@ -66,57 +66,58 @@ const convertUrlType = (param, type) => {
  * HTTP Get method for get single object *
  *****************************************/
 
-app.get(
-  path + '/object' + hashKeyPath + sortKeyPath,
-  async function (req, res) {
-    const params = {};
-    if (req.apiGateway) {
-      // userIdPresent &&
-      params[partitionKeyName] =
-        req.apiGateway.event.requestContext.identity.cognitoIdentityId ||
-        UNAUTH;
+app.get(path + hashKeyPath, async function (req, res) {
+  const params = {};
+  // if (req.apiGateway) {
+  //   // userIdPresent &&
+  //   params[partitionKeyName] =
+  //     req.apiGateway.event.requestContext.identity.cognitoIdentityId || UNAUTH;
+  // } else {
+  //   params[partitionKeyName] = req.params[partitionKeyName];
+
+  //   // convert 타입 변환
+  //   try {
+  //     params[partitionKeyName] = convertUrlType(
+  //       req.params[partitionKeyName],
+  //       partitionKeyType
+  //     );
+  //   } catch (err) {
+  //     res.statusCode = 500;
+  //     res.json({ error: 'Wrong column type ' + err });
+  //   }
+  // }
+
+  // if (hasSortKey) {
+  //   try {
+  //     params[sortKeyName] = convertUrlType(
+  //       req.params[sortKeyName],
+  //       sortKeyType
+  //     );
+  //   } catch (err) {
+  //     res.statusCode = 500;
+  //     res.json({ error: 'Wrong column type ' + err });
+  //   }
+  // }
+
+  let getItemParams = {
+    TableName: tableName,
+    Key: {
+      [partitionKeyName]: req.params[partitionKeyName],
+    },
+  };
+
+  try {
+    const data = await ddbDocClient.send(new GetCommand(getItemParams));
+    if (data.Item) {
+      res.json(data.Item);
     } else {
-      params[partitionKeyName] = req.params[partitionKeyName];
-      try {
-        params[partitionKeyName] = convertUrlType(
-          req.params[partitionKeyName],
-          partitionKeyType
-        );
-      } catch (err) {
-        res.statusCode = 500;
-        res.json({ error: 'Wrong column type ' + err });
-      }
+      res.json(data);
     }
-    if (hasSortKey) {
-      try {
-        params[sortKeyName] = convertUrlType(
-          req.params[sortKeyName],
-          sortKeyType
-        );
-      } catch (err) {
-        res.statusCode = 500;
-        res.json({ error: 'Wrong column type ' + err });
-      }
-    }
-
-    let getItemParams = {
-      TableName: tableName,
-      Key: params,
-    };
-
-    try {
-      const data = await ddbDocClient.send(new GetCommand(getItemParams));
-      if (data.Item) {
-        res.json(data.Item);
-      } else {
-        res.json(data);
-      }
-    } catch (err) {
-      res.statusCode = 500;
-      res.json({ error: 'Could not load items: ' + err.message });
-    }
+  } catch (err) {
+    res.statusCode = 500;
+    res.json({ error: 'Could not load items: ' + err.message });
   }
-);
+});
 
 /************************************
  * HTTP put method for adding an expense to the group - 비용 추가 API *
